@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇷 🇴 🇬 SECURE SHEET</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 15px;
+            background: #111;
+            color: #eee;
+            margin: 0;
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 6px 0;
+        }
+        .input-wrapper input, .input-wrapper textarea {
+            flex-grow: 1;
+            margin: 0;
+            padding: 10px;
+            padding-right: 40px;
+            background: #222;
+            color: #eee;
+            border: 1px solid #444;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .input-wrapper input:focus, .input-wrapper textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+        textarea {
+            height: 50px;
+            resize: vertical;
+        }
+        button.main-btn {
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            background: #333;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        button.main-btn:hover {
+            background: #007bff;
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+        }
+        /* Action Buttons Row */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+        .action-buttons .main-btn {
+            margin-top: 0;
+            flex: 1;
+            padding: 10px 5px;
+            font-size: 13px;
+        }
+        /* Status Bar for UID Check */
+        #check-status {
+            display: none;
+            justify-content: space-around;
+            background: #1a1a1a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            border: 1px solid #333;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        /* Horizontal List & Card Glow Effect */
+        .list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .item-row-card {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1.2fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 12px 15px;
+            cursor: pointer;
+            border: 1px solid #333;
+            border-left: 4px solid #333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 0 8px rgba(0, 123, 255, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            font-size: 13px;
+            color: #ddd;
+        }
+        .item-row-card:hover {
+            transform: translateY(-2px);
+            border-color: #007bff;
+            background: #1f1f1f;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 123, 255, 0.3);
+        }
+        .item-row-card div {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .header-row {
+            background: #222;
+            font-weight: bold;
+            color: #888;
+            cursor: default;
+            border-color: #444;
+            border-left: 4px solid #444;
+            box-shadow: none;
+            text-transform: uppercase;
+            font-size: 11px;
+            padding: 10px 15px;
+        }
+        .header-row:hover {
+            transform: none;
+            border-color: #444;
+            box-shadow: none;
+            background: #222;
+        }
+        /* Status Classes for UID Check */
+        .status-live {
+            border-left: 4px solid #28a745 !important;
+        }
+        .status-dead {
+            border-left: 4px solid #dc3545 !important;
+        }
+        /* Topbar */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid #333;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .left-content {
+            display: flex;
+            align-items: center;
+            width: 40px;
+        }
+        .center-content {
+            flex: 1;
+            text-align: center;
+        }
+        .center-content h2 {
+            margin: 0;
+            font-size: 16px;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .right-content {
+            display: flex;
+            justify-content: flex-end;
+            width: 40px;
+        }
+        .logo {
+            height: 30px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s;
+            padding: 0;
+        }
+        .icon-btn:hover {
+            color: #007bff;
+        }
+        .paste-btn-container {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .paste-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 10px 12px;
+            transition: color 0.2s;
+        }
+        .paste-btn:hover {
+            color: #fff;
+        }
+        /* Notification */
+        #notification {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border-radius: 8px;
+            font-weight: bold;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            white-space: nowrap;
+        }
+        #notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #333;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+            color: #eee;
+            animation: animatetop 0.4s;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+        }
+        .close-button:hover {
+            color: #fff;
+        }
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .edit-button {
+            flex: 1;
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            border:none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .edit-button:hover {
+            background-color: #0056b3;
+        }
+        .delete-button {
+            flex: 1;
+            background-color: #dc3545;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            border:none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .delete-button:hover {
+            background-color: #a71d2a;
+        }
+        @keyframes animatetop {
+            from { top: -300px; opacity: 0; }
+            to { top: 0; opacity: 1; }
+        }
+        /* Modal Table */
+        .modal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .modal-table td {
+            padding: 10px 5px;
+            border-bottom: 1px solid #333;
+            vertical-align: middle;
+        }
+        .modal-table tr:last-child td {
+            border-bottom: none;
+        }
+        .modal-table .label-col {
+            font-weight: bold;
+            width: 25px;
+            text-align: center;
+            color: #007bff;
+        }
+        .modal-table .data-col {
+            word-break: break-all;
+            white-space: pre-wrap;
+            color: #ccc;
+        }
+        .copy-cell {
+            width: 35px;
+            text-align: left;
+        }
+        .copy-btn-modal {
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #aaa;
+            cursor: pointer;
+            padding: 6px 8px;
+            transition: all 0.2s;
+        }
+        .copy-btn-modal:hover {
+            color: #fff;
+            background: #007bff;
+            border-color: #007bff;
+        }
+        /* Sidebar */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            right: 0;
+            background-color: #1a1a1a;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            border-left: 1px solid #333;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+        }
+        .sidebar a {
+            padding: 15px 15px 15px 32px;
+            text-decoration: none;
+            font-size: 15px;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+            border-bottom: 1px solid #222;
+        }
+        .sidebar a:hover {
+            color: #fff;
+            background-color: #333;
+            border-left: 4px solid #007bff;
+        }
+        .sidebar .closebtn {
+            border-bottom: none;
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+            padding: 10px;
+        }
+        .sidebar .closebtn:hover {
+            background: none;
+            border-left: none;
+            color: #dc3545;
+        }
+        .sidebar a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #007bff;
+        }
+        /* Sidebar Input Group - Editable now */
+        .sidebar-input-group {
+            padding: 15px 32px;
+            color: #ccc;
+            background: #111;
+            border-bottom: 1px solid #333;
+        }
+        .sidebar-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #aaa;
+            font-weight: bold;
+        }
+        .sidebar-input-group input {
+            width: 100%;
+            padding: 10px;
+            background: #222;
+            border: 1px solid #555;
+            color: #ffd966;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .sidebar-input-group input:focus {
+            border-color: #007bff;
+            outline: none;
+            background: #2a2a2a;
+        }
+        .info-badge {
+            display: inline-block;
+            background: #007bff20;
+            border-radius: 12px;
+            font-size: 11px;
+            padding: 3px 8px;
+            margin-top: 8px;
+            color: #88ccff;
+            border: 1px solid #007bff40;
+        }
+    </style>
+</head>
+<body>
+
+<div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <div class="sidebar-input-group">
+        <label for="default-pw"><i class="fa-solid fa-key"></i> 🔐 DEFAULT PASSWORD (EDITABLE)</label>
+        <input type="text" id="default-pw" placeholder="Leave empty for auto date password">
+        <small style="display: block; margin-top: 6px; font-size: 11px; color: #aaa; line-height: 1.4;">
+            ⚡ <strong>Auto fallback:</strong> If left blank, uses <span style="color:#ffaa66;">Rohan@#$ + today's date (DD)</span><br>
+            ➤ Today's auto password: <strong id="sample-date-pw">Rohan@#$06</strong><br>
+            ➤ Column 2 (Password) will auto-fill with this default when empty.
+        </small>
+    </div>
+</div>
+
+<div class="topbar">
+    <div class="left-content">
+        <!-- লোগোতে ক্লিক করলে আর লোকালস্টোরেজ ডিলিট হবে না -->
+        <img src="https://i.postimg.cc/QMmHwksM/zenx.png" alt="Logo" class="logo" onclick="showNotification('🔒 Logo clicked – data is safe. Use Delete button to erase.')">
+    </div>
+    <div class="center-content">
+        <h2>🇷 🇴 🇬 SHEET PRO</h2>
+    </div>
+    <div class="right-content">
+        <button class="icon-btn" onclick="openNav()" title="Menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+</div>
+
+<div class="input-wrapper">
+    <input type="text" id="coverid" placeholder="1. UID " onchange="autoFetchUID()">
+    <div class="paste-btn-container">
+        <button class="paste-btn" onclick="tempel('coverid')" title="Paste"><i class="fa-solid fa-paste"></i></button>
+    </div>
+</div>
+<div class="input-wrapper">
+    <input type="text" id="email" placeholder="2. Password ">
+    <div class="paste-btn-container">
+        <button class="paste-btn" onclick="tempel('email')" title="Paste"><i class="fa-solid fa-paste"></i></button>
+    </div>
+</div>
+<div class="input-wrapper">
+    <textarea id="bebas" placeholder="3. 2FA KEY / COOKIE (Auto)"></textarea>
+    <div class="paste-btn-container">
+        <button class="paste-btn" onclick="tempel('bebas')" title="Paste"><i class="fa-solid fa-paste"></i></button>
+    </div>
+</div>
+<div class="input-wrapper">
+    <input type="text" id="info_tambahan" placeholder="4. MAIL (Optional)">
+    <div class="paste-btn-container">
+        <button class="paste-btn" onclick="tempel('info_tambahan')" title="Paste"><i class="fa-solid fa-paste"></i></button>
+    </div>
+</div>
+<div class="input-wrapper">
+    <input type="text" id="kolom5" placeholder="5. NUMBER (Optional)">
+    <div class="paste-btn-container">
+        <button class="paste-btn" onclick="tempel('kolom5')" title="Paste"><i class="fa-solid fa-paste"></i></button>
+    </div>
+</div>
+
+<div class="action-buttons">
+    <button class="main-btn" onclick="simpan()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    <button class="main-btn" onclick="checkAllUID()"><i class="fa-solid fa-magnifying-glass-chart"></i>Check</button>
+    <button class="main-btn" onclick="salinSemua()" style="background: #113311; border-color: #225522; color: #88ff88;"><i class="fa-solid fa-copy"></i> CopyAll</button>
+    <button class="main-btn" onclick="hapusSemua()" style="background: #2a0000; border-color: #550000; color: #ff6b6b;"><i class="fa-solid fa-trash-can"></i> Delete</button>
+</div>
+
+<div id="check-status">
+    <span id="status-live" style="color: #28a745;"><i class="fa-solid fa-check-circle"></i> Live: 0</span>
+    <span id="status-dead" style="color: #dc3545;"><i class="fa-solid fa-times-circle"></i> Dead: 0</span>
+    <span id="status-total" style="color: #ccc;"><i class="fa-solid fa-list"></i> Total: 0</span>
+</div>
+
+<div class="list" id="list"></div>
+<div id="notification"></div>
+
+<div id="note-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <h3 id="modal-title" style="margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px;"><i class="fa-solid fa-circle-info"></i> Record Details</h3>
+        <div id="modal-content"></div>
+        <div class="modal-actions">
+            <button id="edit-note-button" class="edit-button"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+            <button id="delete-note-button" class="delete-button"><i class="fa-solid fa-trash"></i> Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const MAX_CHAR_DISPLAY = 30;
+    let catatan = JSON.parse(localStorage.getItem("catatan5col")) || [];
+    // UID Check variables
+    let liveUIDsCount = 0;
+    let deadUIDsCount = 0;
+    let totalUniqueChecked = 0;
+    const statusLiveEl = document.getElementById("status-live");
+    const statusDeadEl = document.getElementById("status-dead");
+    const statusTotalEl = document.getElementById("status-total");
+
+    // ======================== DYNAMIC PASSWORD WITH DATE + CUSTOM OVERRIDE ========================
+    function getCurrentDayTwoDigits() {
+        const today = new Date();
+        const day = today.getDate();
+        return day < 10 ? '0' + day : '' + day;
+    }
+    function getAutoDatePassword() {
+        return `Rohan@#$${getCurrentDayTwoDigits()}`;
+    }
+    function getEffectiveDefaultPassword() {
+        const custom = localStorage.getItem("customDefaultPassword");
+        if (custom && custom.trim() !== "") {
+            return custom.trim();
+        }
+        return getAutoDatePassword();
+    }
+    function saveCustomPassword() {
+        const input = document.getElementById("default-pw");
+        let value = input.value.trim();
+        if (value === "") {
+            localStorage.removeItem("customDefaultPassword");
+            showNotification("🔓 Custom password cleared. Using auto date password.");
+        } else {
+            localStorage.setItem("customDefaultPassword", value);
+            showNotification("✅ Custom default password saved.");
+        }
+        updateSidebarPasswordDisplay();
+    }
+    function updateSidebarPasswordDisplay() {
+        const inputField = document.getElementById("default-pw");
+        const sampleSpan = document.getElementById("sample-date-pw");
+        const autoPw = getAutoDatePassword();
+        if (sampleSpan) sampleSpan.innerText = autoPw;
+        const custom = localStorage.getItem("customDefaultPassword");
+        if (custom && custom.trim() !== "") {
+            if (inputField.value !== custom) inputField.value = custom;
+        } else {
+            if (inputField.value !== "") inputField.value = "";
+        }
+    }
+    function initSidebarPassword() {
+        const pwInput = document.getElementById("default-pw");
+        if (pwInput) {
+            pwInput.addEventListener("change", saveCustomPassword);
+            pwInput.addEventListener("blur", saveCustomPassword);
+        }
+        updateSidebarPasswordDisplay();
+    }
+
+    // --- Sidebar Functions ---
+    function openNav() {
+        document.getElementById("mySidebar").style.width = "280px";
+    }
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+    }
+
+    // --- Modal Functions ---
+    function closeModal() {
+        document.getElementById("note-modal").style.display = "none";
+    }
+    function showNotification(message) {
+        const notification = document.getElementById("notification");
+        notification.innerHTML = message;
+        if (message.includes("Failed") || message.includes("Cannot") || message.includes("⚠️") || message.includes("❌") || message.includes("Deny")) {
+            notification.style.backgroundColor = '#dc3545';
+        } else if (message.includes("success") || message.includes("✅") || message.includes("🍪") || message.includes("📋") || message.includes("🗑️") || message.includes("Completed") || message.includes("Saved")) {
+            notification.style.backgroundColor = '#28a745';
+        } else if (message.includes("⏳")) {
+            notification.style.backgroundColor = '#007bff';
+        } else {
+            notification.style.backgroundColor = '#333';
+        }
+        notification.classList.add("show");
+        setTimeout(() => notification.classList.remove("show"), 3000);
+    }
+    function truncateText(text, limit) {
+        return text.length > limit ? text.substring(0, limit) + '...' : text;
+    }
+    function ambilID(input) {
+        let match = input.match(/id=(\d+)/);
+        if (match) return match[1];
+        return input;
+    }
+    function extractUIDFromCookie(cookieStr) {
+        if (!cookieStr) return null;
+        let match = cookieStr.match(/c_user=(\d+)/);
+        if (match) return match[1];
+        return null;
+    }
+    async function autoFetchUID() {
+        const inputEl = document.getElementById("coverid");
+        let val = inputEl.value.trim();
+        if (!val) return;
+        if (/^\d+$/.test(val)) return;
+        if (val.includes("c_user=") || val.includes("xs=")) return;
+        let matchId = val.match(/id=(\d+)/);
+        if (matchId) {
+            inputEl.value = matchId[1];
+            showNotification("✅ URL ID detected & converted!");
+            return;
+        }
+        showNotification("⏳ Extracting profile UID...");
+        try {
+            let cleanVal = val.replace(/\/+$/, '').replace(/^(https?:\/\/)?(www\.|m\.|mobile\.|web\.|mbasic\.)?facebook\.com\//i, '');
+            const res = await fetch(`uid.php?username=${encodeURIComponent(cleanVal)}`);
+            const data = await res.json();
+            if (data.uid) {
+                inputEl.value = data.uid;
+                showNotification(`✅ Success! UID: ${data.uid}`);
+            } else {
+                showNotification(`⚠️ Failed to extract UID: ${data.error || 'Not found'}`);
+            }
+        } catch (e) {
+            console.error(e);
+            showNotification("❌ Error: Failed to connect to uid.php");
+        }
+    }
+
+    // --- UID Check Logic ---
+    async function checkUIDReal(uid){
+        let cleanUid = uid.replace(/\D/g, '');
+        if(!cleanUid) cleanUid = uid;
+        const url=`https://graph.facebook.com/${cleanUid}/picture?type=normal`;
+        try{
+            const res=await fetch(url,{method: "HEAD", redirect:"follow", cache:"no-store"});
+            if(res.status===400 || (res.url && res.url.includes("static"))) return false;
+            return true;
+        }catch(e){
+            console.error("Error during check:", e);
+            return false;
+        }
+    }
+    function updateStatus(){
+        statusLiveEl.innerHTML = `<i class="fa-solid fa-check-circle"></i> Live: ${liveUIDsCount}`;
+        statusDeadEl.innerHTML = `<i class="fa-solid fa-times-circle"></i> Dead: ${deadUIDsCount}`;
+        statusTotalEl.innerHTML = `<i class="fa-solid fa-list"></i> Total: ${totalUniqueChecked}`;
+    }
+    async function checkAllUID() {
+        if (catatan.length === 0) return showNotification("❌ No Records to Check!");
+        document.getElementById("check-status").style.display = "flex";
+        showNotification("⏳ Starting UID Check...");
+        liveUIDsCount = 0;
+        deadUIDsCount = 0;
+        totalUniqueChecked = catatan.length;
+        updateStatus();
+        for (let i = 0; i < catatan.length; i++) {
+            const isLive = await checkUIDReal(catatan[i].coverid);
+            if (isLive) {
+                catatan[i].status = "live";
+                liveUIDsCount++;
+            } else {
+                catatan[i].status = "dead";
+                deadUIDsCount++;
+            }
+            updateStatus();
+            localStorage.setItem("catatan5col", JSON.stringify(catatan));
+            render();
+        }
+        showNotification("✅ UID Check Completed!");
+    }
+
+    // --- Modal Logic ---
+    const noteModal = document.getElementById("note-modal");
+    const deleteNoteButton = document.getElementById("delete-note-button");
+    const editNoteButton = document.getElementById("edit-note-button");
+    let catatanIndexToActOn = -1;
+
+    function copyToClipboardModal(textToCopy, label) {
+        const decodedText = new DOMParser().parseFromString(textToCopy, 'text/html').documentElement.textContent;
+        navigator.clipboard.writeText(decodedText).then(() => {
+            showNotification(`✅ Column ${label} copied!`);
+        }).catch(err => {
+            console.error('Copy failed: ', err);
+            showNotification("❌ Failed to copy.");
+        });
+    }
+
+    function showNoteModal(index) {
+        catatanIndexToActOn = index;
+        const item = catatan[index];
+        if (item) {
+            const valA = (item.coverid || '').replace(/'/g, "\\'");
+            const valB = (item.email || '').replace(/'/g, "\\'");
+            const valC = (item.bebas || '').replace(/'/g, "\\'");
+            const valD = (item.info_tambahan || '-').replace(/'/g, "\\'");
+            const valE = (item.kolom5 || '-').replace(/'/g, "\\'");
+            let statusText = `<span style="color:#aaa;">Not checked</span>`;
+            if(item.status === 'live') statusText = `<span style="color:#28a745; font-weight:bold;"><i class="fa-solid fa-check"></i> LIVE</span>`;
+            if(item.status === 'dead') statusText = `<span style="color:#dc3545; font-weight:bold;"><i class="fa-solid fa-xmark"></i> DEAD</span>`;
+
+            document.getElementById("modal-content").innerHTML = `
+                <div style="margin-bottom: 15px; font-size: 13px; text-align: right;">UID Status: ${statusText}</div>
+                <table class="modal-table">
+                    <tr><td class="copy-cell"><button class="copy-btn-modal" onclick="copyToClipboardModal('${valA}', 'A')" title="Copy"><i class="fa-regular fa-copy"></i></button></td> <td class="label-col">A</td><td class="data-col"><span style="color:#888;font-size:12px;">UID/ID:</span><br><b>${item.coverid}</b></td></tr>
+                    <tr><td class="copy-cell"><button class="copy-btn-modal" onclick="copyToClipboardModal('${valB}', 'B')" title="Copy"><i class="fa-regular fa-copy"></i></button></td> <td class="label-col">B</td><td class="data-col"><span style="color:#888;font-size:12px;">Password/Email:</span><br><b>${item.email}</b></td></tr>
+                    <tr><td class="copy-cell"><button class="copy-btn-modal" onclick="copyToClipboardModal('${valC}', 'C')" title="Copy"><i class="fa-regular fa-copy"></i></button></td> <td class="label-col">C</td><td class="data-col"><span style="color:#888;font-size:12px;">Cookie/Note:</span><br><b>${item.bebas}</b></td></tr>
+                    <tr><td class="copy-cell"><button class="copy-btn-modal" onclick="copyToClipboardModal('${valD}', 'D')" title="Copy"><i class="fa-regular fa-copy"></i></button></td> <td class="label-col">D</td><td class="data-col"><span style="color:#888;font-size:12px;">Additional Info:</span><br><b>${item.info_tambahan || '-'}</b></td></tr>
+                    <tr><td class="copy-cell"><button class="copy-btn-modal" onclick="copyToClipboardModal('${valE}', 'E')" title="Copy"><i class="fa-regular fa-copy"></i></button></td> <td class="label-col">E</td><td class="data-col"><span style="color:#888;font-size:12px;">Column 5:</span><br><b>${item.kolom5 || '-'}</b></td></tr>
+                </table>
+            `;
+            noteModal.style.display = "block";
+        }
+    }
+
+    function deleteNote() {
+        if (catatanIndexToActOn > -1) {
+            catatan.splice(catatanIndexToActOn, 1);
+            localStorage.setItem("catatan5col", JSON.stringify(catatan));
+            noteModal.style.display = "none";
+            render();
+            showNotification("🗑️ Delete Successful!");
+            catatanIndexToActOn = -1;
+        }
+    }
+    function editNote() {
+        if (catatanIndexToActOn > -1) {
+            const item = catatan[catatanIndexToActOn];
+            document.getElementById("coverid").value = item.coverid;
+            document.getElementById("email").value = item.email;
+            document.getElementById("bebas").value = item.bebas;
+            document.getElementById("info_tambahan").value = item.info_tambahan;
+            document.getElementById("kolom5").value = item.kolom5;
+            catatan.splice(catatanIndexToActOn, 1);
+            localStorage.setItem("catatan5col", JSON.stringify(catatan));
+            render();
+            closeModal();
+            catatanIndexToActOn = -1;
+            showNotification("✏️ Edit in form and Save again.");
+        }
+    }
+    deleteNoteButton.addEventListener("click", deleteNote);
+    editNoteButton.addEventListener("click", editNote);
+    window.addEventListener("click", (e) => {
+        if (e.target === noteModal) closeModal();
+    });
+
+    // --- Render List ---
+    function render() {
+        let list = document.getElementById("list");
+        list.innerHTML = "";
+        if (catatan.length === 0) {
+            list.innerHTML = '<div style="text-align:center;color:#666;margin-top:20px; font-style: italic;"><i class="fa-solid fa-folder-open" style="font-size: 30px; margin-bottom: 10px; display: block;"></i>No records saved.</div>';
+            document.getElementById("check-status").style.display = "none";
+            return;
+        }
+        list.innerHTML += `
+            <div class="item-row-card header-row">
+                <div>A</div>
+                <div>B</div>
+                <div>C</div>
+                <div>D</div>
+                <div>E</div>
+            </div>`;
+        catatan.forEach((item, index) => {
+            const truncatedBebas = truncateText(item.bebas.replace(/\s+/g, ' '), MAX_CHAR_DISPLAY);
+            let statusClass = "";
+            if (item.status === "live") statusClass = "status-live";
+            if (item.status === "dead") statusClass = "status-dead";
+            list.innerHTML += `
+                <div class="item-row-card ${statusClass}" onclick="showNoteModal(${index})">
+                    <div style="color: #66b2ff; font-weight:bold;">${item.coverid}</div>
+                    <div>${item.email}</div>
+                    <div style="color: #aaa;">${truncatedBebas}</div>
+                    <div>${item.info_tambahan || '-'}</div>
+                    <div>${item.kolom5 || '-'}</div>
+                </div>`;
+        });
+    }
+
+    // --- Save Record ---
+    function simpan() {
+        let rawInput1 = document.getElementById("coverid").value.trim();
+        let rawInput2 = document.getElementById("email").value.trim();
+        let rawInput3 = document.getElementById("bebas").value.trim();
+        let rawInput4 = document.getElementById("info_tambahan").value.trim();
+        let rawInput5 = document.getElementById("kolom5").value.trim();
+        let finalCoverid = "";
+        let finalEmail = "";
+        let finalBebas = "";
+        let finalInfo = "";
+        let finalKolom5 = "";
+
+        const defaultPassword = getEffectiveDefaultPassword();
+        let emailToUse = rawInput2 !== "" ? rawInput2 : defaultPassword;
+
+        let cookieUid = extractUIDFromCookie(rawInput1);
+        if (cookieUid) {
+            finalCoverid = cookieUid;
+            finalEmail = emailToUse;
+            finalBebas = rawInput1;
+            finalInfo = "";
+            finalKolom5 = "";
+            showNotification("🍪 Cookie detected! Auto format applied.");
+        } else {
+            finalCoverid = ambilID(rawInput1);
+            finalEmail = emailToUse;
+            finalBebas = rawInput3;
+            finalInfo = rawInput4;
+            finalKolom5 = rawInput5;
+            if (!finalCoverid || !finalEmail || !finalBebas) {
+                showNotification("⚠️ Failed: Columns (1, 2, 3) must be filled!");
+                return;
+            }
+        }
+        catatan.push({
+            coverid: finalCoverid,
+            email: finalEmail,
+            bebas: finalBebas,
+            info_tambahan: finalInfo,
+            kolom5: finalKolom5,
+            status: ""
+        });
+        localStorage.setItem("catatan5col", JSON.stringify(catatan));
+        render();
+        // Clear inputs
+        document.getElementById("coverid").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("bebas").value = "";
+        document.getElementById("info_tambahan").value = "";
+        document.getElementById("kolom5").value = "";
+        showNotification(`✅ Saved! (Default pass: ${defaultPassword}) Total: ${catatan.length}`);
+    }
+
+    function salinSemua() {
+        if (catatan.length === 0) return showNotification("❌ Empty, nothing to copy!");
+        let text = catatan.map(item => `${item.coverid}\t${item.email}\t${item.bebas}\t${item.info_tambahan || '-'}\t${item.kolom5 || '-'}`).join("\n");
+        let temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+        showNotification("✅ All Data Copied Successfully!");
+    }
+
+    function hapusSemua() {
+        if (catatan.length === 0) return;
+        if (confirm("⚠️ Are you sure you want to delete ALL records? This cannot be undone!")) {
+            catatan = [];
+            localStorage.removeItem("catatan5col");
+            render();
+            showNotification("🗑️ All Data Deleted Successfully ✅");
+        }
+    }
+
+    // Universal Paste function (Android ZURA FBP + Browser)
+    async function tempel(id) {
+        let targetInput = document.getElementById(id);
+        if (!targetInput) {
+            showNotification("❌ Error: Input field not found!");
+            return;
+        }
+        if (typeof window.AndroidJS !== "undefined" || (window.parent && typeof window.parent.AndroidJS !== "undefined")) {
+            try {
+                let textDariHP = typeof window.AndroidJS !== "undefined" ? window.AndroidJS.getClipboardText() : window.parent.AndroidJS.getClipboardText();
+                targetInput.value = textDariHP;
+                targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                showNotification(`📋 Text pasted!`);
+                if (id === 'coverid') autoFetchUID();
+            } catch (e) {
+                showNotification("❌ Failed to connect to Zura APK system.");
+            }
+        } else {
+            try {
+                const text = await navigator.clipboard.readText();
+                targetInput.value = text;
+                targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                showNotification(`📋 Text pasted!`);
+                if (id === 'coverid') autoFetchUID();
+            } catch (err) {
+                showNotification("❌📋 Clipboard Access Denied!");
+            }
+        }
+    }
+
+    // Initialize
+    initSidebarPassword();
+    render();
+</script>
+</body>
+</html>
